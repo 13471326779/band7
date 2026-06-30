@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手环工具 - 智能手环UI</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--deep-blue:#0A2463;--ocean-blue:#1E5FAA;--sky-blue:#3A86FF;--light-blue:#E8F0FE;--medical-white:#F8FAFC;--glass-white:rgba(255,255,255,0.35);--glass-border:rgba(255,255,255,0.2);--text-primary:#0A2463;--text-secondary:#64748B;--heart-red:#FF3366;--green:#10B981;--orange:#F59E0B}
+body{font-family:"Inter",-apple-system,"PingFang SC",sans-serif;background:linear-gradient(135deg,#0A2463 0%,#1E5FAA 50%,#3A86FF 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:40px 20px}
+.phone-frame{width:390px;background:var(--medical-white);border-radius:44px;padding:20px;box-shadow:0 25px 60px rgba(10,36,99,0.3)}
+.watch-viewport{width:100%;aspect-ratio:1/1;background:linear-gradient(170deg,#0C2D6B 0%,#0A2463 40%,#081C4A 100%);border-radius:32px;padding:24px;position:relative;overflow:hidden;box-shadow:inset 0 0 60px rgba(0,0,0,0.3),0 8px 32px rgba(10,36,99,0.2)}
+.glass-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,transparent 50%,rgba(0,0,0,0.1) 100%);border-radius:32px;pointer-events:none;z-index:1}
+.top-bar{display:flex;justify-content:space-between;align-items:center;padding:4px 8px;position:relative;z-index:2}
+.time{font-size:14px;font-weight:600;color:rgba(255,255,255,0.9);letter-spacing:0.5px}
+.time-glass{background:var(--glass-white);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:20px;padding:4px 16px}
+.battery-capsule{display:flex;align-items:center;gap:6px;background:var(--glass-white);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:20px;padding:4px 14px 4px 12px;font-size:11px;color:rgba(255,255,255,0.9);font-weight:500}
+.battery-icon{width:22px;height:11px;border:1.5px solid rgba(255,255,255,0.6);border-radius:3px;position:relative;display:flex;align-items:center;padding:1.5px}
+.battery-icon::after{content:"";position:absolute;right:-4px;top:2.5px;width:2px;height:4px;background:rgba(255,255,255,0.4);border-radius:0 1px 1px 0}
+.battery-fill{height:100%;width:78%;background:var(--green);border-radius:1px}
+.heart-section{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:20px 0 8px}
+.heart-ring-container{position:relative;width:200px;height:200px;display:flex;align-items:center;justify-content:center}
+.heart-ring-svg{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg)}
+.heart-ring-bg{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:4;stroke-linecap:round}
+.heart-ring-progress{fill:none;stroke:url(#heartGradient);stroke-width:4;stroke-linecap:round;stroke-dasharray:251.2;stroke-dashoffset:50.2;animation:pulse-ring 2s ease-in-out infinite}
+@keyframes pulse-ring{0%,100%{stroke-dashoffset:50.2}50%{stroke-dashoffset:40.2}}
+.heart-value{font-size:56px;font-weight:700;color:white;letter-spacing:-1px;line-height:1;position:relative;z-index:3}
+.heart-unit{font-size:14px;font-weight:300;color:rgba(255,255,255,0.5);position:absolute;bottom:52px;right:42px;z-index:3}
+.heart-label{display:flex;align-items:center;gap:4px;margin-top:4px;font-size:13px;color:rgba(255,255,255,0.6);font-weight:400;z-index:3}
+.heart-icon{display:inline-block;animation:heartbeat 1.2s ease-in-out infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.2)}28%{transform:scale(1)}42%{transform:scale(1.15)}56%{transform:scale(1)}}
+.step-mini{text-align:center;margin-top:8px;z-index:3;position:relative}
+.step-number{font-size:22px;font-weight:600;color:white}
+.step-label{font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase}
+.divider{width:60%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);margin:8px auto 12px;position:relative;z-index:2}
+.grid-2x2{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 4px;position:relative;z-index:2}
+.grid-item{background:var(--glass-white);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:18px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all 0.2s ease}
+.grid-item:active{transform:scale(0.93);background:rgba(255,255,255,0.25)}
+.grid-icon{font-size:28px;line-height:1}
+.grid-label{font-size:10px;font-weight:500;color:rgba(255,255,255,0.7);letter-spacing:0.3px}
+.bottom-dock{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2}
+.dock-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2)}
+.dock-dot.active{width:20px;border-radius:3px;background:rgba(255,255,255,0.6)}
+.app-content{padding:20px 8px 8px}
+.app-title{font-size:20px;font-weight:700;color:var(--deep-blue);margin-bottom:4px}
+.app-subtitle{font-size:13px;color:var(--text-secondary);font-weight:400;margin-bottom:16px}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.feature-card{background:white;border:1px solid rgba(58,134,255,0.1);border-radius:16px;padding:16px;text-align:center;transition:all 0.2s ease;cursor:pointer}
+.feature-card:hover{border-color:var(--sky-blue);box-shadow:0 4px 20px rgba(58,134,255,0.15);transform:translateY(-2px)}
+.feature-icon{font-size:28px;margin-bottom:8px}
+.feature-name{font-size:13px;font-weight:600;color:var(--deep-blue)}
+.feature-desc{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.status-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;color:var(--green);margin-bottom:12px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+</style>
+</head>
+<body>
+<div class="phone-frame">
+<div class="watch-viewport">
+<div class="glass-overlay"></div>
+<svg style="position:absolute;width:0;height:0"><defs><linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF3366"/><stop offset="100%" stop-color="#FF6B8A"/></linearGradient></defs></svg>
+<div class="top-bar">
+<div class="time-glass"><span class="time">10:28</span></div>
+<div class="battery-capsule"><div class="battery-icon"><div class="battery-fill"></div></div><span>78%</span></div>
+</div>
+<div class="heart-section">
+<div class="heart-ring-container">
+<svg class="heart-ring-svg" viewBox="0 0 88 88"><circle class="heart-ring-bg" cx="44" cy="44" r="40"/><circle class="heart-ring-progress" cx="44" cy="44" r="40"/></svg>
+<div class="heart-value">72</div>
+<div class="heart-unit">BPM</div>
+</div>
+<div class="heart-label"><span class="heart-icon">&#x2764;&#xFE0F;</span><span>&#x5FC3;&#x7387;</span></div>
+</div>
+<div class="step-mini"><div class="step-number">6,842</div><div class="step-label">&#x4ECA;&#x65E5;&#x6B65;&#x6570;</div></div>
+<div class="divider"></div>
+<div class="grid-2x2">
+<div class="grid-item"><div class="grid-icon">&#x1F526;</div><div class="grid-label">&#x624B;&#x7535;&#x7B52;</div></div>
+<div class="grid-item"><div class="grid-icon">&#x23F1;&#xFE0F;</div><div class="grid-label">&#x8BA1;&#x65F6;&#x5668;</div></div>
+<div class="grid-item"><div class="grid-icon">&#x1F4F1;</div><div class="grid-label">&#x67E5;&#x627E;&#x624B;&#x673A;</div></div>
+<div class="grid-item"><div class="grid-icon">&#x1F4F7;</div><div class="grid-label">&#x9065;&#x63A7;&#x62CD;&#x7167;</div></div>
+</div>
+<div class="bottom-dock"><div class="dock-dot active"></div><div class="dock-dot"></div><div class="dock-dot"></div></div>
+</div>
+<div class="app-content">
+<div class="app-title">&#x624B;&#x73AF;&#x5DE5;&#x5177;&#x7BB1;</div>
+<div class="app-subtitle">&#x5C0F;&#x7C73;&#x624B;&#x73AF;7 &#x7BA1;&#x7406;&#x5DE5;&#x5177;</div>
+<div class="status-badge"><div class="status-dot"></div>&#x5DF2;&#x8FDE;&#x63A5; - &#x5C0F;&#x7C73;&#x624B;&#x73AF;7</div>
+<div class="feature-grid">
+<div class="feature-card"><div class="feature-icon">&#x1F5BC;&#xFE0F;</div><div class="feature-name">&#x8868;&#x76D8;&#x58C1;&#x7EB8;</div><div class="feature-desc">&#x4E0A;&#x4F20;&#x81EA;&#x5B9A;&#x4E49;&#x58C1;&#x7EB8;</div></div>
+<div class="feature-card"><div class="feature-icon">&#x1F4F7;</div><div class="feature-name">&#x624B;&#x73AF;&#x76F8;&#x518C;</div><div class="feature-desc">&#x7BA1;&#x7406;&#x76F8;&#x518C;&#x56FE;&#x7247;</div></div>
+<div class="feature-card"><div class="feature-icon">&#x1F4DA;</div><div class="feature-name">&#x7535;&#x5B50;&#x4E66;</div><div class="feature-desc">&#x63A8;&#x9001;&#x7535;&#x5B50;&#x4E66;</div></div>
+<div class="feature-card"><div class="feature-icon">&#x1F4C1;</div><div class="feature-name">&#x6587;&#x4EF6;&#x7BA1;&#x7406;</div><div class="feature-desc">&#x6D4F;&#x89C8;&#x624B;&#x73AF;&#x6587;&#x4EF6;</div></div>
+<div class="feature-card"><div class="feature-icon">&#x1F9E0;</div><div class="feature-name">&#x8BA1;&#x7B97;&#x5668;</div><div class="feature-desc">&#x6807;&#x51C6;&#x8BA1;&#x7B97;&#x5668;</div></div>
+<div class="feature-card"><div class="feature-icon">&#x1F50D;</div><div class="feature-name">&#x626B;&#x63CF;&#x8BBE;&#x5907;</div><div class="feature-desc">&#x641C;&#x7D22;&#x84DD;&#x7259;&#x8BBE;&#x5907;</div></div>
+</div>
+</div>
+</div>
+</body>
+</html>
