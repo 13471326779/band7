@@ -14,20 +14,17 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: "oracle"
+          distribution: "temurin"
           java-version: "17"
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle
-        run: |
-          curl -sSLo /tmp/gradle.zip "https://services.gradle.org/distributions/gradle-8.5-bin.zip"
-          unzip -q /tmp/gradle.zip -d /opt
-          echo "/opt/gradle-8.5/bin" >> $GITHUB_PATH
+      - name: Make gradlew executable
+        run: chmod +x gradlew
 
       - name: Build APK
-        run: gradle assembleDebug --stacktrace --no-build-cache --no-configuration-cache
+        run: ./gradlew assembleDebug --stacktrace --no-build-cache --no-configuration-cache -Dorg.gradle.daemon=false
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
