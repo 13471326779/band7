@@ -8,16 +8,11 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
 
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
     <application
         android:allowBackup="true"
-        Android：icon“@Android：drawable/ic_menu_gallery“
         android:label="手环工具箱"
         android:supportsRtl="true"
         android:theme="@style/Theme.Band7Tool">
@@ -31,10 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".ble.Band7BLEService"
-            android:foregroundServiceType="connectedDevice" />
 
     </application>
 </manifest>
